@@ -19,7 +19,7 @@
         android:usesCleartextTraffic="false">
         
         <activity
-            android:name=".SplashActivity"
+            android:name="com.guptrix.app.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Guptrix.NoActionBar">
             <intent-filter>
@@ -29,12 +29,22 @@
         </activity>
         
         <activity
-            android:name=".MainActivity"
+            android:name="com.guptrix.app.MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.Guptrix.NoActionBar">
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.guptrix.app.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 </manifest>

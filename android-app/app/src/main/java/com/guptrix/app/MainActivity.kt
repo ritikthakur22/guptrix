@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -24,16 +25,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var networkMonitor: NetworkMonitor
 
     var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private var cameraImageUri: Uri? = null
 
     private val fileChooserLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        var results: Array<Uri>? = null
         if (result.resultCode == Activity.RESULT_OK) {
-            val dataString = result.data?.dataString
-            val results = if (dataString != null) arrayOf(Uri.parse(dataString)) else null
-            filePathCallback?.onReceiveValue(results)
-        } else {
-            filePathCallback?.onReceiveValue(null)
+            val intentData = result.data
+            if (intentData == null || (intentData.data == null && intentData.clipData == null)) {
+                if (cameraImageUri != null) {
+                    results = arrayOf(cameraImageUri!!)
+                }
+            } else {
+                val dataString = intentData.dataString
+                val clipData = intentData.clipData
+                if (clipData != null) {
+                    results = Array(clipData.itemCount) { i -> clipData.getItemAt(i).uri }
+                } else if (dataString != null) {
+                    results = arrayOf(Uri.parse(dataString))
+                }
+            }
         }
+        filePathCallback?.onReceiveValue(results)
         filePathCallback = null
+        cameraImageUri = null
     }
 
     val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
@@ -94,15 +108,51 @@ class MainActivity : AppCompatActivity() {
         permissionLauncher.launch(permissions.toTypedArray())
     }
 
-    fun openFileChooser(callback: ValueCallback<Array<Uri>>, acceptType: String?) {
+    fun openFileChooser(callback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams?) {
+        filePathCallback?.onReceiveValue(null)
         filePathCallback = callback
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "*/*"
-        if (!acceptType.isNullOrEmpty()) {
-            intent.type = acceptType
+
+        val acceptTypes = fileChooserParams?.acceptTypes ?: arrayOf("*/*")
+        val isCaptureEnabled = fileChooserParams?.isCaptureEnabled ?: false
+
+        var takePictureIntent: Intent? = null
+        if (isCaptureEnabled || acceptTypes.any { it.contains("image") }) {
+            takePictureIntent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                val photoFile = java.io.File(getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES), "photo_${System.currentTimeMillis()}.jpg")
+                cameraImageUri = androidx.core.content.FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+                takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, cameraImageUri)
+            } else {
+                takePictureIntent = null
+            }
         }
-        fileChooserLauncher.launch(intent)
+
+        val contentIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            val validMimeTypes = acceptTypes.filter { it.contains("/") }.toTypedArray()
+            if (validMimeTypes.isNotEmpty()) {
+                putExtra(Intent.EXTRA_MIME_TYPES, validMimeTypes)
+            }
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fileChooserParams?.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE)
+        }
+
+        val intentArray = if (takePictureIntent != null) arrayOf(takePictureIntent) else emptyArray<Intent>()
+        val chooserIntent = Intent(Intent.ACTION_CHOOSER).apply {
+            putExtra(Intent.EXTRA_INTENT, contentIntent)
+            putExtra(Intent.EXTRA_TITLE, "Select File or Take Photo")
+            if (intentArray.isNotEmpty()) {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
+            }
+        }
+
+        try {
+            fileChooserLauncher.launch(chooserIntent)
+        } catch (e: Exception) {
+            filePathCallback?.onReceiveValue(null)
+            filePathCallback = null
+            Toast.makeText(this, "Cannot open file chooser", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroy() {

@@ -29,6 +29,11 @@ class DownloadHandler(private val context: Context, private val activity: MainAc
             return
         }
 
+        if (url.startsWith("blob:") || url.startsWith("data:")) {
+            // Blob downloads are now natively intercepted by the Javascript layer!
+            return
+        }
+
         val request = DownloadManager.Request(Uri.parse(url))
         val cookies = CookieManager.getInstance().getCookie(url)
         request.addRequestHeader("cookie", cookies)
