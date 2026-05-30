@@ -1,0 +1,12 @@
+node_modules/
+.next/
+dist/
+build/
+.gradle/
+.idea/
+.vscode/
+*.apk
+*.aab
+local.properties
+.env
+.env.*
