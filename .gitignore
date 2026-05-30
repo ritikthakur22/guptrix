@@ -1,12 +1,46 @@
-node_modules/
-.next/
-dist/
-build/
-.gradle/
-.idea/
-.vscode/
-*.apk
-*.aab
-local.properties
+# Environment variables
 .env
 .env.*
+env/
+venv/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Android/Java
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+build/
+android-app/app/build/
+android-app/build/
+.gradle/
+local.properties
+*.keystore
+release.keystore
+KEYSTORE_INFO.md
+*keystore*
+android-app/keystore/
+
+# IDEs
+.idea/
+*.iml
+*.iws
+.vscode/
+
+# Logs and Crash Dumps
+*.log
+crash_dumps/
+hs_err_pid*
+
+# OS Files
+.DS_Store
+Thumbs.db
