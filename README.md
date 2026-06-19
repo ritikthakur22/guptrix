@@ -4,8 +4,9 @@ Guptrix is a secure, cross-platform encrypted notes application designed to keep
 
 ## Screenshots
 
-![Home Screen Placeholder](docs/screenshots/home.png)
-![Editor Placeholder](docs/screenshots/editor.png)
+![Home Screen (Light Theme)](docs/screenshots/01_home.png)
+![Home Screen (Dark Theme)](docs/screenshots/07_dark_home.png)
+![Offline Mode & Notes](docs/screenshots/09_offline_validation.png)
 
 ## Architecture
 
