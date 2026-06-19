@@ -1,0 +1,14 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_draft"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_new_draft"
+        android:shortcutLongLabel="@string/shortcut_new_draft">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.guptrix.app"
+            android:targetClass="com.guptrix.app.ui.MainActivity">
+            <extra android:name="fragment" android:value="notes"/>
+        </intent>
+    </shortcut>
+</shortcuts>

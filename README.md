@@ -49,3 +49,8 @@ The project is structured into three main repositories/folders:
 ## Deployment Instructions
 
 Both the frontend and backend are Docker-ready and can be deployed to platforms like Vercel (Frontend) and Render/Heroku (Backend). Ensure you inject your secure `.env` files dynamically through your cloud provider's secret manager.
+
+## Developers
+
+- [Ritik Thakur](https://github.com/ritikthakur22)
+- [Adarsh](https://github.com/A-adarsh1)
