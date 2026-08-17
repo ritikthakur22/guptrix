@@ -6,14 +6,23 @@ plugins {
 
 android {
     namespace = "com.guptrix.app"
-    compileSdk = 35
+    compileSdk = 36
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore/new-upload-key.jks")
+            storePassword = "Guptrix#2026"
+            keyAlias = "upload"
+            keyPassword = "Guptrix#2026"
+        }
+    }
 
     defaultConfig {
         applicationId = "com.guptrix.app"
         minSdk = 23
-        targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.2"
+        targetSdk = 36
+        versionCode = 5
+        versionName = "1.0.4"
     }
     
     splits {
@@ -29,6 +38,7 @@ android {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
